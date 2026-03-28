@@ -1,5 +1,6 @@
 # Secrets
 .env
+.Instructions
 
 # Large model files
 *.tflite

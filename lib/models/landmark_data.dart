@@ -83,10 +83,64 @@ class LandmarkData {
   /// Convert to 225-dim Float32 feature vector (normalized)
   /// This is what gets fed to the TFLite models
   Float32List toFeatureVector() {
-    // TODO: Implement feature extraction with normalization
-    // - Pose: nose-relative coordinates
-    // - Hands: wrist-relative + scale normalized
-    return Float32List(225);
+    final features = Float32List(225);
+    int idx = 0;
+
+    // --- POSE (upper body, nose-relative) ---
+    if (hasPose && poseLandmarks!.length >= 25) {
+      final ref = poseLandmarks![0]; // nose as reference
+      for (int i = 0; i < 25; i++) {
+        final lm = poseLandmarks![i];
+        features[idx++] = (lm.x - ref.x).toDouble();
+        features[idx++] = (lm.y - ref.y).toDouble();
+        features[idx++] = (lm.z - ref.z).toDouble();
+        features[idx++] = (lm.visibility ?? 0.0).toDouble();
+      }
+    } else {
+      // No pose detected — zero-fill 100 values
+      idx += 100;
+    }
+
+    // --- LEFT HAND (wrist-relative + scale normalized) ---
+    _normalizeHand(leftHand, features, idx);
+    idx += 63;
+
+    // --- RIGHT HAND (wrist-relative + scale normalized) ---
+    _normalizeHand(rightHand, features, idx);
+
+    return features;
+  }
+
+  /// Normalize a hand's landmarks:
+  /// 1. Subtract wrist (landmark 0) from all points → wrist at origin
+  /// 2. Divide by distance from wrist to middle finger MCP (landmark 9) → scale invariant
+  void _normalizeHand(
+    List<LandmarkPoint>? hand,
+    Float32List output,
+    int startIdx,
+  ) {
+    if (hand == null || hand.length < 21) {
+      // No hand — leave as zeros (already initialized to 0)
+      return;
+    }
+
+    final wrist = hand[0];
+
+    // Compute scale factor: distance from wrist to middle finger MCP (landmark 9)
+    final mcp = hand[9];
+    final dx = mcp.x - wrist.x;
+    final dy = mcp.y - wrist.y;
+    final dz = mcp.z - wrist.z;
+    double scale = math.sqrt(dx * dx + dy * dy + dz * dz);
+    if (scale <= 0) scale = 1.0; // avoid division by zero
+
+    int idx = startIdx;
+    for (int i = 0; i < 21; i++) {
+      final lm = hand[i];
+      output[idx++] = ((lm.x - wrist.x) / scale).toDouble();
+      output[idx++] = ((lm.y - wrist.y) / scale).toDouble();
+      output[idx++] = ((lm.z - wrist.z) / scale).toDouble();
+    }
   }
 
   /// Convert to JSON for data collection export
