@@ -7,6 +7,7 @@
 //   - Left hand: 21 landmarks × 3 (x, y, z) = 63
 //   - Right hand: 21 landmarks × 3 (x, y, z) = 63
 
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 /// Represents a single landmark point
@@ -22,13 +23,28 @@ class LandmarkPoint {
     required this.z,
     this.visibility,
   });
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{'x': x, 'y': y, 'z': z};
+    if (visibility != null) map['v'] = visibility;
+    return map;
+  }
+
+  factory LandmarkPoint.fromJson(Map<String, dynamic> json) {
+    return LandmarkPoint(
+      x: (json['x'] as num).toDouble(),
+      y: (json['y'] as num).toDouble(),
+      z: (json['z'] as num).toDouble(),
+      visibility: json['v'] != null ? (json['v'] as num).toDouble() : null,
+    );
+  }
 }
 
 /// Represents all landmarks extracted from a single frame
 class LandmarkData {
-  final List<LandmarkPoint>? poseLandmarks;   // 25 upper body points
-  final List<LandmarkPoint>? leftHand;         // 21 hand points
-  final List<LandmarkPoint>? rightHand;        // 21 hand points
+  final List<LandmarkPoint>? poseLandmarks; // 25 upper body points
+  final List<LandmarkPoint>? leftHand; // 21 hand points
+  final List<LandmarkPoint>? rightHand; // 21 hand points
   final double poseConfidence;
   final double leftHandConfidence;
   final double rightHandConfidence;
@@ -50,6 +66,20 @@ class LandmarkData {
       (leftHand != null && leftHand!.isNotEmpty) ||
       (rightHand != null && rightHand!.isNotEmpty);
 
+  /// Overall confidence — min of detected components
+  double get overallConfidence {
+    if (!hasPose && !hasHand) return 0.0;
+    final scores = <double>[];
+    if (hasPose) scores.add(poseConfidence);
+    if (leftHand != null && leftHand!.isNotEmpty) {
+      scores.add(leftHandConfidence);
+    }
+    if (rightHand != null && rightHand!.isNotEmpty) {
+      scores.add(rightHandConfidence);
+    }
+    return scores.isEmpty ? 0.0 : scores.reduce(math.min);
+  }
+
   /// Convert to 225-dim Float32 feature vector (normalized)
   /// This is what gets fed to the TFLite models
   Float32List toFeatureVector() {
@@ -58,4 +88,40 @@ class LandmarkData {
     // - Hands: wrist-relative + scale normalized
     return Float32List(225);
   }
+
+  /// Convert to JSON for data collection export
+  Map<String, dynamic> toJson() {
+    return {
+      'pose': poseLandmarks?.map((p) => p.toJson()).toList(),
+      'left_hand': leftHand?.map((p) => p.toJson()).toList(),
+      'right_hand': rightHand?.map((p) => p.toJson()).toList(),
+    };
+  }
+
+  /// Create from JSON (for loading saved data)
+  factory LandmarkData.fromJson(Map<String, dynamic> json) {
+    return LandmarkData(
+      poseLandmarks: json['pose'] != null
+          ? (json['pose'] as List)
+                .map((p) =>
+                    LandmarkPoint.fromJson(Map<String, dynamic>.from(p)))
+                .toList()
+          : null,
+      leftHand: json['left_hand'] != null
+          ? (json['left_hand'] as List)
+                .map((p) =>
+                    LandmarkPoint.fromJson(Map<String, dynamic>.from(p)))
+                .toList()
+          : null,
+      rightHand: json['right_hand'] != null
+          ? (json['right_hand'] as List)
+                .map((p) =>
+                    LandmarkPoint.fromJson(Map<String, dynamic>.from(p)))
+                .toList()
+          : null,
+    );
+  }
+
+  /// Create an empty landmark data (all zeros)
+  static const empty = LandmarkData();
 }
