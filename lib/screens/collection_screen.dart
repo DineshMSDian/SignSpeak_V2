@@ -1,7 +1,11 @@
 // collection_screen.dart
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/landmark_data.dart';
 import '../services/mediapipe_service.dart';
 import '../widgets/skeleton_overlay.dart';
@@ -34,7 +38,8 @@ class _CollectionScreenState extends State<CollectionScreen> {
   // Storage
   final Map<String, List<Map<String, dynamic>>> _collectedData = {};
   SignMode _datasetMode = SignMode.asl;
-  String _currentLabel = 'A'; // Hardcoded label sequence logic comes in step 2.9
+  final TextEditingController _labelController = TextEditingController(text: 'A');
+  String get _currentLabel => _labelController.text.trim().toUpperCase();
 
   @override
   void initState() {
@@ -121,6 +126,40 @@ class _CollectionScreenState extends State<CollectionScreen> {
     if (_samplesCollected >= _targetSamples) {
       _stopCapture();
       debugPrint('Collected $_targetSamples samples for $_currentLabel');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Finished collecting $_targetSamples for $_currentLabel')),
+      );
+    }
+  }
+
+  Future<void> _exportData() async {
+    if (_collectedData.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No data to export!')),
+        );
+      }
+      return;
+    }
+
+    try {
+      final directory = await getTemporaryDirectory();
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final file = File('${directory.path}/signspeak_data_$timestamp.json');
+
+      final jsonString = jsonEncode(_collectedData);
+      await file.writeAsString(jsonString);
+
+      if (mounted) {
+        await Share.shareXFiles([XFile(file.path)], text: 'SignSpeak V2 Dataset');
+      }
+    } catch (e) {
+      debugPrint('Export error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to export: $e')),
+        );
+      }
     }
   }
 
@@ -129,6 +168,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
     _stopCapture();
     _cameraController?.dispose();
     _mediaPipeService.dispose();
+    _labelController.dispose();
     super.dispose();
   }
 
@@ -142,11 +182,43 @@ class _CollectionScreenState extends State<CollectionScreen> {
       ),
       body: Column(
         children: [
-          Padding(
+          Container(
             padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Samples: $_samplesCollected / $_targetSamples',
-              style: const TextStyle(color: Colors.white, fontSize: 18),
+            color: Colors.black87,
+            child: Row(
+              children: [
+                DropdownButton<SignMode>(
+                  value: _datasetMode,
+                  dropdownColor: Colors.grey[850],
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  items: const [
+                    DropdownMenuItem(value: SignMode.asl, child: Text('ASL')),
+                    DropdownMenuItem(value: SignMode.isl, child: Text('ISL')),
+                  ],
+                  onChanged: _isCapturing ? null : (v) {
+                    if (v != null) setState(() => _datasetMode = v);
+                  },
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: TextField(
+                    controller: _labelController,
+                    enabled: !_isCapturing,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: 'Label (e.g. A, HELLO)',
+                      labelStyle: TextStyle(color: Colors.white54),
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white54)),
+                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  '$_samplesCollected/$_targetSamples',
+                  style: const TextStyle(color: Colors.greenAccent, fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -170,18 +242,31 @@ class _CollectionScreenState extends State<CollectionScreen> {
                 : const Center(child: CircularProgressIndicator(color: Colors.blueAccent)),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24.0),
-            child: ElevatedButton(
-              onPressed: _isCapturing ? _stopCapture : _startCapture,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _isCapturing ? Colors.red : Colors.green,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-              ),
-              child: Text(
-                _isCapturing ? 'Stop Recording' : 'Start Recording',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _isCapturing ? null : _exportData,
+                  icon: const Icon(Icons.download),
+                  label: const Text('Export JSON'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[800],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _isCapturing ? _stopCapture : _startCapture,
+                  icon: Icon(_isCapturing ? Icons.stop : Icons.fiber_manual_record),
+                  label: Text(_isCapturing ? 'Stop Reconding' : 'Record Label'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isCapturing ? Colors.red : Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
