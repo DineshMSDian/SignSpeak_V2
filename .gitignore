@@ -1,0 +1,25 @@
+# Secrets
+.env
+
+# Large model files
+*.tflite
+*.h5
+*.pkl
+
+# Python
+__pycache__/
+*.pyc
+venv/
+datasets/
+
+# Flutter
+build/
+.dart_tool/
+android/local.properties
+ios/Pods/
+ios/.symlinks/
+
+# IDE
+.idea/
+.vscode/
+*.iml
