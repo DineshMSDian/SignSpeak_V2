@@ -21,7 +21,43 @@ class GestureBadge extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    // TODO: Implement animated badge with confidence bar
-    return const Placeholder();
+    final barColor = confidence > 0.88 ? Colors.greenAccent : Colors.amberAccent;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: barColor, width: 2),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label!,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: barColor.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '${(confidence * 100).toStringAsFixed(0)}%',
+              style: TextStyle(
+                color: barColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -8,7 +8,6 @@
 // CRITICAL: Normalization is non-negotiable — model accuracy depends on it
 
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
@@ -174,10 +173,10 @@ class MediaPipeService {
 
       return LandmarkData(
         poseLandmarks: poseResult.landmarks,
-        leftHand: handResult.leftHand,
+        leftHand: null,
         rightHand: handResult.rightHand,
         poseConfidence: poseResult.confidence,
-        leftHandConfidence: handResult.leftConfidence,
+        leftHandConfidence: 0.0,
         rightHandConfidence: handResult.rightConfidence,
       );
     } catch (e) {
@@ -361,19 +360,18 @@ class MediaPipeService {
 
 /// Internal result class for hand detection
 class _HandDetectionResult {
-  final List<LandmarkPoint>? leftHand;
   final List<LandmarkPoint>? rightHand;
-  final double leftConfidence;
   final double rightConfidence;
 
   _HandDetectionResult({
-    this.leftHand,
     this.rightHand,
-    this.leftConfidence = 0.0,
     this.rightConfidence = 0.0,
   });
 
-  factory _HandDetectionResult.empty() => _HandDetectionResult();
+  factory _HandDetectionResult.empty() => _HandDetectionResult(
+        rightHand: null,
+        rightConfidence: 0.0,
+      );
 }
 
 /// Internal result class for pose detection
