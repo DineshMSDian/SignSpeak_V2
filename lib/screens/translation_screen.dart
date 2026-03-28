@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import '../services/mediapipe_service.dart';
 import '../services/tflite_service.dart';
 import '../services/gemini_service.dart';
@@ -21,7 +22,8 @@ class _TranslationScreenState extends State<TranslationScreen> {
   // Services
   final MediaPipeService _mediaPipeService = MediaPipeService();
   final TFLiteService _tfliteService = TFLiteService();
-  final GeminiService _geminiService = GeminiService(); // Stubbed for now
+  final GeminiService _geminiService = GeminiService();
+  final FlutterTts _flutterTts = FlutterTts();
 
   // Camera
   CameraController? _cameraController;
@@ -157,24 +159,35 @@ class _TranslationScreenState extends State<TranslationScreen> {
     setState(() => _isTranslating = true);
 
     try {
-      // Stub: in step 2.13 we will flesh out Gemini service fully
-      await Future.delayed(const Duration(seconds: 2));
+      final isASL = _mode == ActiveSignMode.asl;
+      final result = await _geminiService.translateSequence(_detectedSequence, isASL);
       
       if (mounted) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: Colors.grey[900],
-            title: const Text('Translation Result', style: TextStyle(color: Colors.white)),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Translation Result', style: TextStyle(color: Colors.white)),
+                IconButton(
+                  icon: const Icon(Icons.volume_up, color: Colors.blueAccent),
+                  onPressed: () => _flutterTts.speak(result.english),
+                ),
+              ],
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Original: ${_detectedSequence.join(' ')}', style: const TextStyle(color: Colors.white70)),
+                Text('Original: ${_detectedSequence.join(isASL ? '' : ' ')}', style: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic)),
                 const SizedBox(height: 16),
-                const Text('English: Hello, how are you?', style: TextStyle(color: Colors.greenAccent, fontSize: 18)),
-                const Text('Tamil: வணக்கம், எப்படி இருக்கிறீர்கள்?', style: TextStyle(color: Colors.blueAccent, fontSize: 18)),
-                const Text('Hindi: नमस्ते, आप कैसे हैं?', style: TextStyle(color: Colors.orangeAccent, fontSize: 18)),
+                Text('English: ${result.english}', style: const TextStyle(color: Colors.greenAccent, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text('Tamil: ${result.tamil}', style: const TextStyle(color: Colors.blueAccent, fontSize: 18)),
+                const SizedBox(height: 8),
+                Text('Hindi: ${result.hindi}', style: const TextStyle(color: Colors.orangeAccent, fontSize: 18)),
               ],
             ),
             actions: [
