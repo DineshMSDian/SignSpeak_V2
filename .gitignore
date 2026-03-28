@@ -10,6 +10,7 @@
 __pycache__/
 *.pyc
 venv/
+.venv/
 datasets/
 
 # Flutter
@@ -23,3 +24,9 @@ ios/.symlinks/
 .idea/
 .vscode/
 *.iml
+
+# Python training data (too large for git)
+python_training/data/asl_raw/*.json
+python_training/data/isl_raw/*.json
+python_training/models/*.h5
+python_training/models/*.tflite

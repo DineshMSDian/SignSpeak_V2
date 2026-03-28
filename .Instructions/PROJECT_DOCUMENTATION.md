@@ -1,4 +1,4 @@
-# SignBridge — Project Documentation
+# SignSpeak V2 — Project Documentation
 > **HOW THIS FILE WORKS:**
 > Every time the agent adds a feature, fixes a bug, or makes a decision — it MUST update this file immediately.
 > This is your single source of truth for project review, viva, or presentation.
@@ -10,14 +10,14 @@
 
 | Field | Detail |
 |-------|--------|
-| **Project Name** | SignBridge |
+| **Project Name** | SignSpeak V2 |
 | **Purpose** | Real-time ASL (26 letters) + ISL (10 gestures) recognition with multilingual translation |
 | **Platform** | Flutter (Android/iOS) |
 | **Camera Used** | Back camera only |
 | **AI Models** | TFLite on-device (MLP for ASL, LSTM for ISL) |
 | **Translation API** | Gemini Pro |
-| **Started** | — |
-| **Last Updated** | — |
+| **Started** | 2026-03-28 |
+| **Last Updated** | 2026-03-28 |
 
 ---
 
@@ -66,10 +66,10 @@
 > Agent: Update this section whenever a new file or folder is created.
 
 ```
-signbridge/
+SignSpeak V2/
 │
 ├── lib/
-│   ├── main.dart                        # App entry point
+│   ├── main.dart                        # App entry point (SignBridgeApp)
 │   ├── screens/
 │   │   ├── home_screen.dart             # Landing page, mode selector
 │   │   ├── collection_screen.dart       # Data collection UI
@@ -79,7 +79,7 @@ signbridge/
 │   ├── services/
 │   │   ├── mediapipe_service.dart       # Runs landmark detection
 │   │   ├── tflite_service.dart          # Loads + runs TFLite models
-│   │   ├── temporal_filter.dart         # Anti-spam prediction filter
+│   │   ├── temporal_filter.dart         # Anti-spam prediction filter (IMPLEMENTED)
 │   │   └── gemini_service.dart          # Gemini Pro API calls
 │   │
 │   ├── models/
@@ -92,10 +92,9 @@ signbridge/
 │
 ├── assets/
 │   ├── models/
-│   │   ├── asl_model.tflite             # Trained ASL letter classifier
-│   │   └── isl_model.tflite             # Trained ISL gesture classifier
+│   │   └── README.md                    # TFLite models go here after training
 │   └── labels/
-│       ├── asl_labels.txt               # A-Z labels
+│       ├── asl_labels.txt               # A-Z labels (26 letters)
 │       └── isl_labels.txt               # 10 ISL gesture names
 │
 ├── python_training/
@@ -103,13 +102,18 @@ signbridge/
 │   ├── train_asl.py                     # Train MLP for ASL
 │   ├── train_isl.py                     # Train LSTM for ISL
 │   ├── export_tflite.py                 # Convert .h5 → .tflite
-│   └── data/
-│       ├── asl_raw/                     # JSON collected from mobile
-│       └── isl_raw/                     # JSON collected from mobile
+│   ├── data/
+│   │   ├── asl_raw/                     # JSON collected from mobile
+│   │   └── isl_raw/                     # JSON collected from mobile
+│   └── models/                          # Trained .h5 and .tflite files
 │
 ├── .env                                 # API keys (NOT committed to git)
+├── .gitignore                           # Excludes .env, .tflite, data, build
 ├── pubspec.yaml                         # Flutter dependencies
-└── PROJECT_DOCUMENTATION.md            # This file
+└── .Instructions/
+    ├── ASL_ISL_PROJECT_INSTRUCTIONS.md  # Master architecture reference
+    ├── COMMIT_STYLE_GUIDE.md            # Commit message format
+    └── PROJECT_DOCUMENTATION.md         # This file
 ```
 
 ---
@@ -123,42 +127,67 @@ signbridge/
 ---
 
 ### Step 1 — Project Initialization
-- **Status:** ⬜ Pending
-- **Date:** —
-- **What was done:** —
-- **Files created/modified:** —
-- **Why:** —
-- **Notes:** —
+- **Status:** ✅ Done
+- **Date:** 2026-03-28
+- **What was done:** Initialized complete Flutter project structure. Replaced default counter app with SignBridge app entry point. Created all screen placeholders, service files, model data classes, and widget files as defined in the architecture spec. Set up python_training directory with placeholder scripts and data directories. Created asset directories for models and labels.
+- **Files created/modified:**
+  - `lib/main.dart` — app entry point, dark theme, routes to HomeScreen
+  - `lib/screens/home_screen.dart` — placeholder
+  - `lib/screens/collection_screen.dart` — placeholder
+  - `lib/screens/recognition_screen.dart` — placeholder
+  - `lib/screens/translation_screen.dart` — placeholder
+  - `lib/services/mediapipe_service.dart` — placeholder
+  - `lib/services/tflite_service.dart` — placeholder
+  - `lib/services/temporal_filter.dart` — **FULLY IMPLEMENTED** (4-layer anti-spam pipeline)
+  - `lib/services/gemini_service.dart` — placeholder + TranslationResult class
+  - `lib/models/landmark_data.dart` — LandmarkPoint + LandmarkData classes
+  - `lib/models/prediction_result.dart` — PredictionResult + SignMode enum
+  - `lib/widgets/skeleton_overlay.dart` — placeholder CustomPainter
+  - `lib/widgets/gesture_badge.dart` — placeholder confidence badge
+  - `assets/labels/asl_labels.txt` — 26 ASL letters A-Z
+  - `assets/labels/isl_labels.txt` — 10 ISL gesture names
+  - `assets/models/README.md` — placeholder for TFLite models
+  - `python_training/preprocess.py` — placeholder
+  - `python_training/train_asl.py` — placeholder
+  - `python_training/train_isl.py` — placeholder
+  - `python_training/export_tflite.py` — placeholder
+  - `python_training/data/asl_raw/README.md`
+  - `python_training/data/isl_raw/README.md`
+  - `python_training/models/README.md`
+- **Why:** Clean architecture from the start — separated concerns into screens, services, models, widgets. Temporal filter implemented early because it was the #1 bug in the original SignSpeak project.
+- **Notes:** Project uses `signspeak_v2` as package name. App displays as "SignBridge".
 
 ---
 
 ### Step 2 — pubspec.yaml & Dependencies
-- **Status:** ⬜ Pending
-- **Date:** —
-- **What was done:** —
+- **Status:** ✅ Done
+- **Date:** 2026-03-28
+- **What was done:** Configured pubspec.yaml with all required dependencies and declared asset directories. Ran `flutter pub get` — all dependencies resolved successfully.
 - **Files created/modified:** `pubspec.yaml`
 - **Dependencies added:**
 
 | Package | Version | Purpose |
-|---------|---------|---------|
-| camera | — | Back camera access |
-| tflite_flutter | — | On-device TFLite inference |
-| http | — | Gemini API calls |
-| provider | — | State management |
-| flutter_tts | — | Read out translations |
-| path_provider | — | Save JSON data files |
-| share_plus | — | Export collected data |
+|---------|---------|--------|
+| camera | ^0.11.1 | Back camera access |
+| tflite_flutter | ^0.11.0 | On-device TFLite inference |
+| http | ^1.3.0 | Gemini API calls |
+| provider | ^6.1.2 | State management |
+| flutter_tts | ^4.2.0 | Read out translations |
+| path_provider | ^2.1.5 | Save JSON data files |
+| share_plus | ^10.1.4 | Export collected data |
+| flutter_dotenv | ^5.2.1 | Load .env file (API keys) |
+| lottie | ^3.3.1 | Loading animations |
 
-- **Notes:** —
+- **Notes:** Assets declared: `assets/models/`, `assets/labels/`, `.env`
 
 ---
 
 ### Step 3 — Folder Structure Setup
-- **Status:** ⬜ Pending
-- **Date:** —
-- **What was done:** —
-- **Files created/modified:** —
-- **Notes:** —
+- **Status:** ✅ Done
+- **Date:** 2026-03-28
+- **What was done:** Created complete folder structure matching the architecture spec. All directories: `lib/screens/`, `lib/services/`, `lib/models/`, `lib/widgets/`, `assets/models/`, `assets/labels/`, `python_training/`, `python_training/data/asl_raw/`, `python_training/data/isl_raw/`, `python_training/models/`.
+- **Files created/modified:** All 23 files listed in Step 1 above.
+- **Notes:** Steps 1, 2, and 3 were done together as a single project initialization pass. Updated `.gitignore` to exclude `.env`, `*.tflite`, `*.h5`, `__pycache__/`, `build/`, `.dart_tool/`, python training data/models, and IDE files.
 
 ---
 
@@ -241,7 +270,7 @@ signbridge/
 - **Date:** —
 - **What was done:** —
 - **Files created/modified:** `lib/services/collection_screen.dart`
-- **Export format:** `/Downloads/signbridge_data/{ASL or ISL}/{label}.json`
+- **Export format:** `/Downloads/SignSpeak V2_data/{ASL or ISL}/{label}.json`
 - **Transfer method:** Google Drive share button or ADB pull
 - **Notes:** —
 
@@ -616,8 +645,8 @@ Respond ONLY in JSON: {"english": "", "tamil": "", "hindi": ""}
 
 ## ✅ Project Checklist
 
-- [ ] Flutter project created
-- [ ] Dependencies added (pubspec.yaml)
+- [x] Flutter project created
+- [x] Dependencies added (pubspec.yaml)
 - [ ] Back camera working
 - [ ] MediaPipe hands + pose running
 - [ ] Landmark normalization implemented
@@ -640,6 +669,6 @@ Respond ONLY in JSON: {"english": "", "tamil": "", "hindi": ""}
 
 ---
 
-*SignBridge — ASL & ISL Recognition Project*
+*SignSpeak V2 — ASL & ISL Recognition Project*
 *Documentation maintained by: AI Agent (Antigravity)*
 *For project review reference only*

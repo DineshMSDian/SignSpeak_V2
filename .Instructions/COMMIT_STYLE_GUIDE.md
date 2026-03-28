@@ -1,4 +1,4 @@
-# Commit Message Style Guide — SignBridge Project
+# Commit Message Style Guide — SignSpeak V2 Project
 > Reference this when writing commit messages. Keep it human, keep it YOU.
 
 ---
@@ -6,7 +6,7 @@
 ## Your Commit DNA (from SignSpeak history)
 
 ```
-SignBridge: [Short title in Title Case or lowercase mix]
+SignSpeak V2: [Short title in Title Case or lowercase mix]
 
 - bullet point 1 explaining what changed
 - bullet point 2 why it was needed
@@ -31,7 +31,7 @@ Use `git commit` (opens editor) or `git commit -m "title" -m "body"`
 ### 🔰 Project Init
 
 ```
-SignBridge: Initializing project — Flutter + MediaPipe fresh start
+SignSpeak V2: Initializing project — Flutter + MediaPipe fresh start
 
 starting from scratch cuz the old mediapipe legacy was a mess
 new stack: Flutter (mobile) + MediaPipe Tasks API + TFLite + Gemini Pro
@@ -41,7 +41,7 @@ Source:
 ```
 
 ```
-SignBridge: add pubspec.yaml with all required dependencies
+SignSpeak V2: add pubspec.yaml with all required dependencies
 
 camera, tflite_flutter, mediapipe, http, provider — the whole gang
 also added flutter_tts for speaking out translations
@@ -55,7 +55,7 @@ tflite_flutter needs special setup on android, check NDK version
 ### 📁 Project Structure
 
 ```
-SignBridge: setup folder structure for screens, services and models
+SignSpeak V2: setup folder structure for screens, services and models
 
 created screens/, services/, models/, widgets/ under lib/
 assets/models/ for tflite files, assets/labels/ for label txts
@@ -68,7 +68,7 @@ assets/models/ for tflite files, assets/labels/ for label txts
 ### 📷 Camera Setup
 
 ```
-SignBridge: [1/4] implementing back camera with CameraX
+SignSpeak V2: [1/4] implementing back camera with CameraX
 
 back camera only — this is important
 front cam caused flip issues in SignSpeak, not repeating that mistake
@@ -79,7 +79,7 @@ inference and data collection BOTH use back cam = no coordinate mismatch
 ```
 
 ```
-SignBridge: [2/4] lock orientation and set camera resolution
+SignSpeak V2: [2/4] lock orientation and set camera resolution
 
 locked to portrait mode
 set resolution to 720p — good balance between landmark quality and speed
@@ -89,7 +89,7 @@ set resolution to 720p — good balance between landmark quality and speed
 ```
 
 ```
-SignBridge: [3/4] camera preview renders to flutter widget
+SignSpeak V2: [3/4] camera preview renders to flutter widget
 
 used CameraPreview inside a Stack so we can overlay skeleton later
 wrapped in AspectRatio to prevent stretching
@@ -99,7 +99,7 @@ Source:
 ```
 
 ```
-SignBridge: [4/4] camera permissions handled for android and ios
+SignSpeak V2: [4/4] camera permissions handled for android and ios
 
 added camera permission in AndroidManifest.xml and Info.plist
 shows permission dialog on first launch, handles denial gracefully
@@ -113,7 +113,7 @@ shows permission dialog on first launch, handles denial gracefully
 ### 🦴 MediaPipe Integration
 
 ```
-SignBridge: [1/3] integrating mediapipe tasks — hand + pose landmarker
+SignSpeak V2: [1/3] integrating mediapipe tasks — hand + pose landmarker
 
 moved from legacy mp.solutions (old) to new MediaPipe Tasks API
 uses .task model files instead of the old python mediapipe
@@ -125,7 +125,7 @@ Hand Landmarker + Pose Landmarker run independently
 ```
 
 ```
-SignBridge: [2/3] extracting pose + both hand landmarks per frame
+SignSpeak V2: [2/3] extracting pose + both hand landmarks per frame
 
 upper body pose: landmarks 0-24 (skipping legs, not needed)
 left hand: 21 landmarks, right hand: 21 landmarks
@@ -140,7 +140,7 @@ hand-only was the reason ISL was bad in SignSpeak
 ```
 
 ```
-SignBridge: [3/3] normalize landmarks — wrist relative + scale normalize
+SignSpeak V2: [3/3] normalize landmarks — wrist relative + scale normalize
 
 this is the big fix from our old project
 raw coordinates depend on where you stand → model gets confused
@@ -159,7 +159,7 @@ Source:
 ### 🖼️ Skeleton Overlay
 
 ```
-SignBridge: skeleton overlay widget — draws landmarks on camera feed
+SignSpeak V2: skeleton overlay widget — draws landmarks on camera feed
 
 CustomPainter draws dots on hand + pose landmarks
 green dots for hands, blue for pose connections
@@ -174,7 +174,7 @@ renders on top of camera preview using Stack widget
 ### 📦 Data Collection Screen
 
 ```
-SignBridge: data collection screen UI — basic layout
+SignSpeak V2: data collection screen UI — basic layout
 
 screen has: camera feed, gesture label, sample counter, progress bar
 auto-capture toggle, skip button, export button
@@ -187,7 +187,7 @@ someone holds the phone, other person signs in front
 ```
 
 ```
-SignBridge: auto-capture logic — saves sample every 500ms
+SignSpeak V2: auto-capture logic — saves sample every 500ms
 
 captures landmark data automatically while pose+hand confidence > 0.85
 no need to tap for every sample, just hold the sign
@@ -203,9 +203,9 @@ should be enough for decent accuracy
 ```
 
 ```
-SignBridge: save collected data as JSON to device downloads
+SSignSpeak V2: save collected data as JSON to device downloads
 
-each gesture saves to /Downloads/signbridge_data/ASL/A.json
+each gesture saves to /Downloads/SignSpeak V2_data/ASL/A.json
 format: metadata + array of samples with pose + left_hand + right_hand
 
 - added share button to upload directly to google drive
@@ -216,7 +216,7 @@ transfer JSON to PC → run python training → get .tflite → put back in asse
 ```
 
 ```
-SignBridge: confidence gate — only save high quality samples
+SignSpeak V2: confidence gate — only save high quality samples
 
 added validation before saving each frame
 requires: pose_confidence > 0.8 AND at least one hand detected
@@ -231,7 +231,7 @@ discards bad frames silently (no error shown to user)
 ### 🧠 TFLite Model Integration
 
 ```
-SignBridge: load ASL and ISL tflite models from assets
+SignSpeak V2: load ASL and ISL tflite models from assets
 
 both models loaded on app init
 ASL input shape: (1, 225) — single frame
@@ -246,7 +246,7 @@ remember to declare them in pubspec.yaml under flutter: assets:
 ```
 
 ```
-SignBridge: ASL inference — single frame MLP prediction
+SignSpeak V2: ASL inference — single frame MLP prediction
 
 takes 1 frame of landmarks (225 features)
 runs through tflite ASL model
@@ -258,7 +258,7 @@ returns letter + confidence score
 ```
 
 ```
-SignBridge: ISL inference — 30 frame sequence LSTM prediction
+SignSpeak V2: ISL inference — 30 frame sequence LSTM prediction
 
 maintains a rolling buffer of last 30 frames
 when buffer full, runs LSTM model
@@ -275,7 +275,7 @@ cant use single frame like ASL — needs sequence of frames
 ### 🛡️ Anti-Spam Temporal Filter
 
 ```
-SignBridge: temporal filter — fixes the spam detection from SignSpeak
+SignSpeak V2: temporal filter — fixes the spam detection from SignSpeak
 
 this was the main bug in our old project — random spamming of letters
 implemented 4-layer filter: majority vote + confidence gate + hold + cooldown
@@ -298,7 +298,7 @@ Source:
 ### 🌐 Gemini Pro Translation
 
 ```
-SignBridge: gemini service — translates ASL letters to words
+SignSpeak V2: gemini service — translates ASL letters to words
 
 calls Gemini Pro API with accumulated fingerspelled letters
 prompt asks for: english word reconstruction + tamil + hindi translation
@@ -313,7 +313,7 @@ using gemini-pro model, temperature 0.2 (more deterministic output)
 ```
 
 ```
-SignBridge: gemini service — ISL gesture sequence translation
+SignSpeak V2: gemini service — ISL gesture sequence translation
 
 separate prompt for ISL — sends gesture labels like "NAMASTE, HELLO, GOOD"
 asks Gemini to convert gesture sequence to natural English sentence
@@ -328,7 +328,7 @@ Source:
 ### 🎨 Translation Screen
 
 ```
-SignBridge: translation screen — displays gemini output in 3 languages
+SignSpeak V2: translation screen — displays gemini output in 3 languages
 
 three cards: English, Tamil, Hindi
 each card has language flag emoji + translated text
@@ -398,7 +398,7 @@ tested on Pixel 6 (works), Samsung A52 (works now)
 ### ✨ UI Polish
 
 ```
-SignBridge: gesture badge widget — shows current prediction with animation
+SignSpeak V2: gesture badge widget — shows current prediction with animation
 
 small floating card at bottom of camera feed
 shows: letter/gesture name + confidence percentage + color coded bar
@@ -406,7 +406,7 @@ green if confidence > 0.88, yellow 0.7-0.88, hidden below 0.7
 ```
 
 ```
-SignBridge: home screen — model status indicator
+SignSpeak V2: home screen — model status indicator
 
 shows green tick if both ASL and ISL models loaded successfully
 shows red warning if model file missing from assets
@@ -418,7 +418,7 @@ user knows immediately if something is wrong before trying to sign
 ### 📊 Training Scripts (commit from PC after training)
 
 ```
-SignBridge: python preprocessing — normalize + augment collected data
+SignSpeak V2: python preprocessing — normalize + augment collected data
 
 loads all JSON files from data/ASL/ and data/ISL/
 applies wrist-relative normalization and scale normalization
@@ -428,7 +428,7 @@ augments with: horizontal flip + gaussian noise (3x data)
 ```
 
 ```
-SignBridge: trained ASL model — MLP, 94% validation accuracy
+SignSpeak V2: trained ASL model — MLP, 94% validation accuracy
 
 3-layer MLP: Dense(256) → Dense(128) → Dense(64) → Dense(26)
 trained on 7800 samples (100 per class × 3 augmentations)
@@ -439,7 +439,7 @@ val accuracy: 94.2%, val loss: 0.21
 ```
 
 ```
-SignBridge: trained ISL model — LSTM, 89% validation accuracy
+SignSpeak V2: trained ISL model — LSTM, 89% validation accuracy
 
 2-layer LSTM: LSTM(64) → LSTM(128) → Dense(64) → Dense(10)
 trained on 2400 sequences (80 per gesture × 30 frames × 3 aug)
@@ -459,7 +459,7 @@ especially for SORRY and PLEASE — those look similar
 
 | Tag | When to use |
 |-----|------------|
-| `SignBridge:` | new feature or implementation |
+| `SignSpeak V2:` | new feature or implementation |
 | `fix:` | bug fix |
 | `refactor:` | restructuring without behavior change |
 | `chore:` | pubspec updates, .gitignore, configs |
@@ -473,7 +473,7 @@ especially for SORRY and PLEASE — those look similar
 ```bash
 # Regular commit
 git add .
-git commit -m "SignBridge: short title" -m "body explanation here"
+git commit -m "SignSpeak V2: short title" -m "body explanation here"
 git push origin main
 
 # If you messed up the last commit message

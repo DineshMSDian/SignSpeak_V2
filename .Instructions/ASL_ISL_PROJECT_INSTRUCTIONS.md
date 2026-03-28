@@ -138,7 +138,7 @@ asl_isl_project/
 ```
 ┌─────────────────────────────┐
 │                             │
-│     🤟 SignBridge           │
+│     🤟 SignSpeak           │
 │     ASL & ISL Translator    │
 │                             │
 │  ┌─────────────────────┐   │
@@ -624,7 +624,7 @@ dev_dependencies:
 }
 ```
 
-**Save location on device:** `/Downloads/signbridge_data/ASL/A.json`  
+**Save location on device:** `/Downloads/SignSpeak V2_data/ASL/A.json`  
 **Transfer to PC:** ADB pull or Google Drive upload button in app
 
 ---
@@ -743,17 +743,7 @@ def load_isl_sequences(data_dir, seq_len=30):
 ## 🎯 ISL — 10 Gestures to Collect
 
 | # | Gesture | Description |
-|---|---------|-------------|
-| 1 | NAMASTE | Both palms together |
-| 2 | HELLO | Open palm wave |
-| 3 | THANK_YOU | Right hand from lips outward |
-| 4 | YES | Fist nodding motion |
-| 5 | NO | Index finger side to side |
-| 6 | HELP | Fist on open palm, lifted up |
-| 7 | PLEASE | Circular hand on chest |
-| 8 | SORRY | Fist circular on chest |
-| 9 | GOOD | Thumbs up |
-| 10 | BAD | Thumbs down |
+      To Be Decided
 
 ---
 
@@ -877,5 +867,5 @@ BUFFER_SIZE=15
 
 ---
 
-*Generated for SignBridge project — ASL & ISL Recognition App*
+*Generated for SignSpeak V2 project — ASL & ISL Recognition App*
 *Stack: Flutter + MediaPipe Tasks + TFLite + Gemini Pro*
