@@ -1,0 +1,23 @@
+﻿Analyzing collection_screen.dart...                             
+
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\screens\collection_screen.dart:332:15 - deprecated_member_use
+   info - 'shareXFiles' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\screens\collection_screen.dart:332:21 - deprecated_member_use
+
+flutter : 2 issues found. 
+(ran in 2.0s)
+At line:1 char:1
++ flutter analyze lib\scre
+ens\collection_screen.dart
+ 2>&1 | Out-File -E ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~
+    + CategoryInfo        
+      : NotSpecified: (2  
+   issues found. (ran i   
+ n 2.0s):String) [], R    
+emoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 

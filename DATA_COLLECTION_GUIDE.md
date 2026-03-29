@@ -62,20 +62,44 @@ A machine learning model is only as smart as the data it's given. Follow these r
 - Try to have a relatively plain background behind you.
 - Wear a shirt that contrasts with your skin tone (avoid wearing skin-colored shirts, otherwise the AI struggles to separate your hands from your torso).
 
-**Recording ASL (American Sign Language)**
-*ASL relies solely on static finger positions (like holding up an 'A' or 'B').*
+---
+
+### 🔤 Recording ASL (American Sign Language) — Static Mode
+*ASL relies solely on static finger positions (like holding up an 'A' or 'B'). Each sample is a single frozen hand shape.*
+
 1. Toggle the app dropdown to **ASL**.
 2. Type the letter you are signing in the Label box (e.g., `A`).
 3. Form the letter with your hand, hold it steady, and press **Record Label**.
-4. The app will capture exactly 100 frames. 
-5. **PRO-TIP:** *Don't be a statue! Slightly rotate your wrist or smoothly move your hand an inch closer to the camera while it records. This creates variance and makes the AI infinitely smarter.*
+4. The app will rapidly capture exactly **100 independent frame snapshots** at ~30fps. This takes about 3 seconds.
+5. The counter in the top-right shows progress: `23/100 frames`.
+6. **PRO-TIP:** *Don't be a statue! Slightly rotate your wrist or smoothly move your hand an inch closer to the camera while it records. This creates variance and makes the AI infinitely smarter.*
 
-**Recording ISL (Indian Sign Language)**
-*ISL relies on dynamic movements involving both hands, arms, and chest space (like swiping down for "Please").*
+---
+
+### 🤌 Recording ISL (Indian Sign Language) — Sequential Mode
+*ISL relies on dynamic movements involving both hands, arms, and chest space (like swiping down for "Please"). Each sample is a complete 2-second gesture recording.*
+
+**How it works:**
+- One sample = one **continuous 2-second recording** (60 frames at 30fps)
+- 100 samples = 100 complete gesture recordings
+- You record **one gesture at a time**, reviewing between each
+
+**Step-by-step:**
 1. Toggle the app dropdown to **ISL**.
-2. Type the word you are signing (e.g., `HELLO`).
-3. Press **Record Label** and perform the complete gesture. 
-4. **PRO-TIP:** *Since ISL is movement-based, perform the word smoothly, reset your hands, and perform it again until the 100-frame counter hits the limit.*
+2. Type the word/gesture you are signing (e.g., `HELLO`).
+3. Get ready to perform the gesture, then press **"Record Gesture (2s)"**.
+4. A **red recording overlay** appears with a 2-second countdown — perform the full gesture smoothly during this window.
+5. The app captures exactly **60 sequential frames** over 2 seconds, then **automatically stops**.
+6. You'll see a **"✓ Gesture Saved!"** confirmation flash.
+7. The counter updates: `1/100 gestures`.
+8. Reset your hands to starting position, then press **"Record Gesture (2s)"** again for the next sample.
+9. Repeat until you reach 100 gestures.
+
+**ISL Pro-Tips:**
+- ✅ **Perform the gesture the same way each time** — consistency matters more than speed.
+- ✅ **Vary the speed slightly** between recordings (some a bit faster, some slower) for robust training.
+- ✅ **Move naturally** — don't exaggerate movements. The AI should learn real-world gestures.
+- ⚠️ **Don't worry about confidence dips** — the app records all 60 frames regardless of tracking quality, since fast hand movements can briefly confuse the tracker.
 
 ---
 
@@ -84,3 +108,8 @@ When your session is complete:
 1. Tap the **Export JSON** button in the app.
 2. The Android Share Sheet will appear. 
 3. **Send that `.json` file to Dinesh!** (You can email it, drop it in a shared drive, or WhatsApp it). We will use those raw JSON files to train the Python Neural Networks!
+
+### Understanding the Export Format
+- **ASL data** is exported as flat frame arrays: `"asl_A": [{frame1}, {frame2}, ... {frame100}]`
+- **ISL data** is exported as nested sequence arrays: `"isl_HELLO": [[60 frames], [60 frames], ... [60 frames]]`
+  - Each inner array is one complete 2-second gesture recording

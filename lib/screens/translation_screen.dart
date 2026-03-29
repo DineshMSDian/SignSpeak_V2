@@ -135,8 +135,8 @@ class _TranslationScreenState extends State<TranslationScreen> {
   Future<void> _processISL(LandmarkData landmarks) async {
     _islFrameBuffer.add(landmarks);
     
-    // When we hit 30 frames, extract sequence and run ISL LSTM
-    if (_islFrameBuffer.length >= 30) {
+    // When we hit 60 frames (2s @ 30fps), extract sequence and run ISL LSTM
+    if (_islFrameBuffer.length >= 60) {
       final sequence = _islFrameBuffer.map((l) => l.toFeatureVector()).toList();
       _islFrameBuffer.clear(); // reset buffer
       

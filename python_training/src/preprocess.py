@@ -9,7 +9,7 @@ RAW_DATA_DIR = '../data/raw_json'
 OUT_DATA_DIR = '../data/processed_npy'
 
 # Constants
-SEQUENCE_LENGTH = 30  # Frames per sequence for ISL LSTM
+SEQUENCE_LENGTH = 60  # Frames per sequence for ISL LSTM (2s @ 30fps)
 
 def extract_features(frame_data):
     """
@@ -104,13 +104,26 @@ def main():
                     asl_y.append(label)
                     
             elif mode == 'ISL':
-                # ISL is dynamic: construct 30-frame sliding windows
-                # E.g. 100 frames -> 71 overlapping samples of 30 frames each
-                if len(frame_vectors) >= SEQUENCE_LENGTH:
-                    for i in range(len(frame_vectors) - SEQUENCE_LENGTH + 1):
-                        window = frame_vectors[i : i + SEQUENCE_LENGTH]
-                        isl_X.append(window)
-                        isl_y.append(label)
+                # ISL data from the new Flutter pipeline arrives pre-sequenced:
+                # Each entry in `frames` is itself a list of 60 frame dicts.
+                # Detect format: if the first element is a list, it's pre-sequenced.
+                if len(frames) > 0 and isinstance(frames[0], list):
+                    # New format: each entry is already a complete 60-frame sequence
+                    for sequence in frames:
+                        seq_vectors = [extract_features(frame) for frame in sequence]
+                        if len(seq_vectors) == SEQUENCE_LENGTH:
+                            isl_X.append(seq_vectors)
+                            isl_y.append(label)
+                        else:
+                            print(f"  ⚠️ Skipping ISL sequence with {len(seq_vectors)} frames (expected {SEQUENCE_LENGTH})")
+                else:
+                    # Legacy fallback: flat frames → sliding window
+                    print(f"  ℹ️ Using sliding window for legacy flat ISL data")
+                    if len(frame_vectors) >= SEQUENCE_LENGTH:
+                        for i in range(len(frame_vectors) - SEQUENCE_LENGTH + 1):
+                            window = frame_vectors[i : i + SEQUENCE_LENGTH]
+                            isl_X.append(window)
+                            isl_y.append(label)
 
     # Save ASL datasets
     if asl_X:

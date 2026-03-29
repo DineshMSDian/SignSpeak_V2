@@ -29,8 +29,8 @@ def main():
     print(f"Loaded ISL Data: X={X.shape}, y={y_raw.shape}")
     
     # Validation constraint
-    if len(X.shape) != 3 or X.shape[1] != 30 or X.shape[2] != 225:
-        print("❌ CRITICAL ERROR: ISL training data must be shape (samples, 30, 225).")
+    if len(X.shape) != 3 or X.shape[1] != 60 or X.shape[2] != 225:
+        print("❌ CRITICAL ERROR: ISL training data must be shape (samples, 60, 225).")
         return
 
     # 1. Encode string labels to categorical integers
@@ -50,9 +50,9 @@ def main():
     # 2. Train/Test split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=42)
 
-    # 3. Build Long Short-Term Memory (LSTM) for 30-frame temporal sequence inference
+    # 3. Build Long Short-Term Memory (LSTM) for 60-frame temporal sequence inference (2s @ 30fps)
     model = Sequential([
-        LSTM(64, return_sequences=True, activation='tanh', input_shape=(30, 225)),
+        LSTM(64, return_sequences=True, activation='tanh', input_shape=(60, 225)),
         Dropout(0.2),
         LSTM(128, return_sequences=True, activation='tanh'),
         Dropout(0.2),

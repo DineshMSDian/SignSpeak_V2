@@ -66,18 +66,22 @@ class LandmarkData {
       (leftHand != null && leftHand!.isNotEmpty) ||
       (rightHand != null && rightHand!.isNotEmpty);
 
-  /// Overall confidence — min of detected components
-  double get overallConfidence {
-    if (!hasPose && !hasHand) return 0.0;
-    final scores = <double>[];
-    if (hasPose) scores.add(poseConfidence);
+  /// Maximum confidence across all detected hands
+  double get maxHandConfidence {
+    double maxScore = 0.0;
     if (leftHand != null && leftHand!.isNotEmpty) {
-      scores.add(leftHandConfidence);
+      maxScore = math.max(maxScore, leftHandConfidence);
     }
     if (rightHand != null && rightHand!.isNotEmpty) {
-      scores.add(rightHandConfidence);
+      maxScore = math.max(maxScore, rightHandConfidence);
     }
-    return scores.isEmpty ? 0.0 : scores.reduce(math.min);
+    return maxScore;
+  }
+
+  /// Overall confidence strictly gated on hand confidence for Data Collection
+  double get overallConfidence {
+    if (!hasHand) return 0.0;
+    return maxHandConfidence;
   }
 
   /// Convert to 225-dim Float32 feature vector (normalized)
