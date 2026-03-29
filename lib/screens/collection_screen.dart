@@ -108,8 +108,8 @@ class _CollectionScreenState extends State<CollectionScreen> {
     if (!_isCapturing || _currentLandmarks == null) return;
     final landmarks = _currentLandmarks!;
 
-    if (!landmarks.hasPose || !landmarks.hasHand) return;
-    if (landmarks.overallConfidence < 0.85) return;
+    if (!landmarks.hasHand) return; // Only mandate that a hand is visible, torso can be cut off
+    if (landmarks.overallConfidence < 0.50) return; // Dropped from 0.85 to 0.50 for realistic lighting
 
     final key = '${_datasetMode.name}_$_currentLabel';
     _collectedData.putIfAbsent(key, () => []);

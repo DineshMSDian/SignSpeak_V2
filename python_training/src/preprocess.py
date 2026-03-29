@@ -91,8 +91,8 @@ def main():
             if len(parts) != 2:
                 continue
                 
-            mode = parts[0]
-            label = parts[1]
+            mode = parts[0].upper()
+            label = parts[1].upper()
             
             # Convert all raw frames in this recording to normalized 225-dim vectors
             frame_vectors = [extract_features(frame) for frame in frames]
